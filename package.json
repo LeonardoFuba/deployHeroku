@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node-dev --transpile-only --ignore-watch node_modules --respawn src/server.ts",
-    "knex:migrate": "knex --knexfile knexfile.ts migrate:latest",
-    "knex:migrate:rollback": "knex --knexfile knexfile.ts migrate:rollback",
+    "knex:migrate": "knex --knexfile dist/knexfile.js migrate:latest",
+    "knex:rollback": "knex --knexfile dist/knexfile.js migrate:rollback",
     "test": "cross-env NODE_ENV=test jest",
     "build": "tsc"
   },
