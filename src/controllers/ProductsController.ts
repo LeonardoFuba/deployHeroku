@@ -109,7 +109,7 @@ export default {
     }
 
     const products = await db('products').select('*');
-    const images = await db('images').select('*');
+    const images = await db('images').select('*').orderBy('id');
 
     return response.json(productView.renderMany(products, images));
   },
@@ -126,7 +126,8 @@ export default {
     const images = await db('products')
         .select('*')
         .join('images', 'products.id', '=', 'images.product_id')
-        .where('product_id', id);
+        .where('product_id', id)
+        .orderBy('images.id');
 
     return response.json(productView.render(product, images));
   },
