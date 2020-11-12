@@ -5,7 +5,7 @@ export default {
   render(image: Image) {
     return {
       id: image.id,
-      url: image.path,
+      url: image.url,
     };
   },
 
