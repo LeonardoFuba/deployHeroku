@@ -1,8 +1,5 @@
 export default interface Image {
   id: number;
-  name: string;
-  size: number;
-  key: string;
-  url: string;
+  path: string;
   product_id: number;
 }

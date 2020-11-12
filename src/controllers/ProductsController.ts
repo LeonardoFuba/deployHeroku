@@ -4,10 +4,6 @@ import * as Yup from 'yup';
 import db from '../database/connection';
 import productView from '../views/products_view';
 
-import Item from 'src/models/Item';
-import Product from 'src/models/Product';
-import { File } from 'src/config/multer';
-
 
 export default {
   // Adicionar novo produto ao estoque
@@ -25,7 +21,7 @@ export default {
       height,
     } = request.body;
 
-    const trx = await db.transaction();
+     const trx = await db.transaction();
 
     const data = {
       code,
@@ -62,22 +58,16 @@ export default {
 
       const product_id = insertedProductsIds[0];
 
-      const requestImages = request.files as File[];
+      const requestImages = request.files as Express.Multer.File[];
       const images = requestImages.map(image => {
-        return {
-          name: image.originalname,
-          size: image.size,
-          key: image.key,
-          url: image.location,
-          product_id }
+        return { path: image.filename, product_id }
       });
+
+      console.log(images);
 
       const imageSchema = Yup.array(
         Yup.object().shape({
-          name: Yup.string().required(),
-          size: Yup.number().required(),
-          key: Yup.string().required(),
-          url: Yup.string().required(),
+          path: Yup.string().required(),
           product_id: Yup.number().required()
         })
       )
@@ -90,7 +80,7 @@ export default {
 
       await trx.commit();
 
-      return response.status(201).json({ message: 'successfully created.'});
+      return response.send("done!");
     }
     catch (err) {
       await trx.rollback();
@@ -119,7 +109,7 @@ export default {
     }
 
     const products = await db('products').select('*');
-    const images = await db('images').select('*');
+    const images = await db('images').select('*').orderBy('id');
 
     return response.json(productView.renderMany(products, images));
   },
@@ -136,47 +126,12 @@ export default {
     const images = await db('products')
         .select('*')
         .join('images', 'products.id', '=', 'images.product_id')
-        .where('product_id', id);
+        .where('product_id', id)
+        .orderBy('images.id');
 
     return response.json(productView.render(product, images));
   },
 
-  async update(request: Request, response: Response) {
-    const itemsBought: Item[] = request.body;
-
-    itemsBought.map( async(item: Item, index) => {
-      try {
-        const product: Product = await db('products')
-          .select('stock')
-          .where('code', item.code )
-          .first();
-
-        await db('products')
-          .where('code', '=', item.code )
-          .update({
-            stock: product.stock - item.quantity,
-            thisKeyIsSkipped: undefined
-          });
-
-        return response.status(200).json({ message: 'successfully updated.'});
-      }
-      catch (err) {
-        console.log(err);
-
-        return response.status(400).json({
-          error: 'Unexpected error while update stock.'
-        })
-      }
-    })
-  },
-
-  async delete(request: Request, response: Response) {
-    const { id } = request.params;
-
-    db('products')
-      .where('id', '=', id)
-      .del()
-
-    return response.status(200).json({ message: 'successfully deleted.'});
-  },
+  // async update(request: Request, response: Response) {},
+  // async delete(request: Request, response: Response) {},
 }
