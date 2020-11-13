@@ -68,7 +68,7 @@ export default {
           name: image.originalname,
           size: image.size,
           key: image.key,
-          url: image.location,
+          url: image.location || "",
           product_id }
       });
 
@@ -86,8 +86,7 @@ export default {
         abortEarly: false,
       })
 
-      await trx('images').insert(images).returning('id');
-
+      await trx('images').insert(images);
       await trx.commit();
 
       return response.status(201).json({ message: 'successfully created.'});
