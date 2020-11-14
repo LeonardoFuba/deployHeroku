@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
+import aws from 'aws-sdk';
 
 import db from '../database/connection';
 import productView from '../views/products_view';
@@ -87,6 +88,7 @@ export default {
       })
 
       await trx('images').insert(images);
+
       await trx.commit();
 
       return response.status(201).json({ message: 'successfully created.'});
@@ -143,39 +145,89 @@ export default {
   async update(request: Request, response: Response) {
     const itemsBought: Item[] = request.body;
 
-    itemsBought.map( async(item: Item, index) => {
-      try {
-        const product: Product = await db('products')
+    const trx = await db.transaction();
+
+    try {
+      itemsBought.forEach( async(item: Item, index) => {
+
+
+        const product = await trx('products')
           .select('stock')
           .where('code', item.code )
           .first();
 
-        await db('products')
-          .where('code', '=', item.code )
+          console.log('pr' ,product);
+
+
+        await trx('products')
+          .where('code', item.code )
           .update({
             stock: product.stock - item.quantity,
             thisKeyIsSkipped: undefined
           });
 
-        return response.status(200).json({ message: 'successfully updated.'});
-      }
-      catch (err) {
-        console.log(err);
+          await trx.commit();
+      })
 
-        return response.status(400).json({
-          error: 'Unexpected error while update stock.'
-        })
-      }
-    })
+    }
+    catch (err) {
+      await trx.rollback();
+      console.log(err);
+
+      return response.status(400).json({
+        error: 'Unexpected error while update stock.'
+      })
+    }
+
+
+    return response.status(200).json({ message: 'successfully updated.'});
   },
 
   async delete(request: Request, response: Response) {
     const { id } = request.params;
 
-    db('products')
-      .where('id', '=', id)
-      .del()
+    const trx = await db.transaction();
 
-    return response.status(200).json({ message: 'successfully deleted.'});
+    try{
+      const keys = await trx('images')
+        .select('key')
+        .where('product_id', '=', id);
+
+      const s3 = new aws.S3();
+
+      s3.deleteObjects({
+        Bucket: process.env.BUCKET_NAME || "",
+        Delete: {
+          Objects: keys.map((element) => {return({ Key: element.key})})
+        },
+      }, function(err, data) {
+          if (err) console.log(err, err.stack);
+          else     console.log(data);
+        }
+      )
+      .promise()
+      .then((response: any) => {
+        console.log('status', response.status);
+      })
+      .catch((response: any) => {
+        console.log('catch', response.status);
+      });
+
+      await trx('products')
+        .where('id', '=', id)
+        .del()
+
+      await trx.commit();
+
+      return response.status(200).json({ message: 'successfully deleted.'});
+    }
+    catch(err) {
+      await trx.rollback();
+      console.log(err);
+
+      return response.status(400).json({
+        error: 'Unexpected error while delete a product.'
+      })
+    }
   },
 }
