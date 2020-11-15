@@ -6,6 +6,12 @@ import multerS3 from 'multer-s3';
 
 const MAX_SIZE_TWO_MEGABYTES = 2 * 1024 * 1024;
 
+const credentials = new aws.Config({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_DEFAULT_REGION
+});
+
 export interface File extends Express.Multer.File {
   location: string;
   key: string;
@@ -24,7 +30,7 @@ const storageTypes = {
   }),
 
   s3: multerS3({
-    s3: new aws.S3(),
+    s3: new aws.S3(credentials),
     bucket: process.env.BUCKET_NAME || "",
     contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: "public-read",
