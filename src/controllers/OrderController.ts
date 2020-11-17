@@ -108,7 +108,6 @@ export default {
 
     const orders = await db('orders').select('*');
 
-    return response.json(orders);
-    // return response.json(orderView.renderMany(orders));
+    return response.json(orderView.renderMany(orders));
   },
 }

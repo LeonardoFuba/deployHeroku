@@ -15,7 +15,7 @@ routes.post('/products', upload.array('images'), ProductsController.create);    
 routes.put('/products', ProductsController.update);                             //atualiza estoque apos uma compra
 routes.delete('/products/:id', ProductsController.delete);                      //retira do estoque um produto
 
-routes.post('/orders', OrderController.index);                                //listar pedidos
+routes.get('/orders', OrderController.index);                                //listar pedidos
 routes.post('/checkout', OrderController.create);                              //finalizar a compra
 
 export default routes;

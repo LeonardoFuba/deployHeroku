@@ -68,7 +68,7 @@ export default {
           name: image.originalname,
           size: image.size,
           key: image.key,
-          url: image.location || "",
+          url: image.location,
           product_id }
       });
 
@@ -113,7 +113,6 @@ export default {
         .select('images.*')
         .join('images', 'products.id', '=', 'images.product_id')
         .where('category', String(type));
-      console.log(images);
 
       return response.json(productView.renderMany(products, images));
     }
@@ -154,9 +153,6 @@ export default {
           .select('stock')
           .where('code', item.code )
           .first();
-
-          console.log('pr' ,product);
-
 
         await trx('products')
           .where('code', item.code )
