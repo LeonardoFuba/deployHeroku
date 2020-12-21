@@ -5,7 +5,6 @@ import querystring from 'querystring';
 
 import xmlToJson from '../utils/xmlToJson';
 import createXml from '../utils/createXml';
-import checkoutResponse from '../utils/checkoutResponse';
 
 export default {
 
