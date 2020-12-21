@@ -7,6 +7,7 @@ import ProductsController from './controllers/ProductsController';
 import OrderController from './controllers/OrderController';
 import ZipCodeController from './controllers/ZipCodeController';
 import ShippingController from './controllers/ShippingController';
+import CheckoutController from './controllers/CheckoutController';
 
 const routes = Router();
 const upload = multer(uploadConfig);
@@ -19,9 +20,11 @@ routes.delete('/products/:id', ProductsController.delete);                      
 
 routes.get('/orders', OrderController.index);                                   //listar pedidos
 routes.get('/orders/:id', OrderController.show);                                //listar pedidos
-routes.post('/checkout', OrderController.create);                               //finalizar a compra
+routes.post('/orders', OrderController.create);                                 //finalizar a compra
 
-routes.get('/cep/:cep', ZipCodeController.show);																//consulta informacoes sobre o cep
-routes.post('/preco', ShippingController.index);																//calcula frete e prazo dos correios
+routes.get('/cep/:cep', ZipCodeController.show);                                //consulta informacoes sobre o cep
+routes.post('/preco', ShippingController.index);                                //calcula frete e prazo dos correios
+
+routes.post('/checkout', CheckoutController.create);                            //obter autorizacao pagseguro
 
 export default routes;
