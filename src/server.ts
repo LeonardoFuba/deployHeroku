@@ -11,36 +11,22 @@ import 'dotenv/config';
 
 const app = express();
 
-
-const allowedOrigins = [
+var allowedOrigins = [
   'http://localhost:3000',
-  'http://alira.vercel.app',
-  'https://df2a9c27470d.ngrok.io'
+  'https://alira.vercel.app',
 ];
-
 app.use(cors({
-  origin: (origin='http://alira:3000', callback) => {
-
+  origin: function(origin, callback){
+    // allow requests with no origin (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
     if(allowedOrigins.indexOf(origin) === -1){
-      const msg = 'The CORS policy for this site does not ' +
+      var msg = `The CORS policy for ${origin} does not ` +
                 'allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }
-
     return callback(null, true);
   }
 }));
-
-// [
-//   'http://localhost:3000',
-//   'http://alira.vercel.app',
-//   'http://aliranotes.com.br',
-//   'http://743d62eba705.ngrok.io'
-// ]
-
-// app.use(cors({ origin: 'http://localhost:3000'          }));
-// app.use(cors({ origin: 'http://743d62eba705.ngrok.io'   }));
-// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(routes);

@@ -8,7 +8,6 @@ import orderView from '../views/order_view';
 
 export default {
   async create(request: Request, response: Response) {
-
     const {
       email,
       phone,
@@ -75,19 +74,7 @@ export default {
         shipping_state: Yup.string().max(2)
       });
 
-      const imageSchema = Yup.object().shape({
-        images: Yup.array(
-          Yup.object().shape({
-            path: Yup.string().required()
-          })
-        )
-      });
-
       await orderSchema.validate(data, {
-        abortEarly: false,
-      })
-
-      await imageSchema.validate(data, {
         abortEarly: false,
       })
 
