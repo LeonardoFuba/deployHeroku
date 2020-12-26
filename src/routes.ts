@@ -8,6 +8,7 @@ import OrderController from './controllers/OrderController';
 import ZipCodeController from './controllers/ZipCodeController';
 import ShippingController from './controllers/ShippingController';
 import CheckoutController from './controllers/CheckoutController';
+import NotificationController from './controllers/NotificationController';
 
 const routes = express.Router();
 const upload = multer(uploadConfig);
@@ -26,5 +27,7 @@ routes.get('/cep/:cep', ZipCodeController.show);                                
 routes.post('/preco', ShippingController.show);                                 //calcular frete com api soap dos correios
 
 routes.post('/checkout', CheckoutController.create);                            //checkout do pagseguro em REST
+
+routes.post('/notification', NotificationController.create);                     //notificacao de mudanca de status do pagamento
 
 export default routes;
