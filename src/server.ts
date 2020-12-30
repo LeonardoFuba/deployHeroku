@@ -14,6 +14,7 @@ const app = express();
 var allowedOrigins = [
   'http://localhost:3000',
   'https://alira.vercel.app',
+  'https://sandbox.pagseguro.uol.com.br',
 ];
 app.use(cors({
   origin: function(origin, callback){

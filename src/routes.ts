@@ -28,6 +28,6 @@ routes.post('/preco', ShippingController.show);                                 
 
 routes.post('/checkout', CheckoutController.create);                            //checkout do pagseguro em REST
 
-routes.post('/notification', NotificationController.create);                     //notificacao de mudanca de status do pagamento
+routes.post('/notification', NotificationController.show, ProductsController.update);                     //notificacao de mudanca de status do pagamento
 
 export default routes;

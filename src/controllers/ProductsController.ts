@@ -144,31 +144,59 @@ export default {
   },
 
   async update (request: Request, response: Response) {
-    const { orderId } = request.body;
+
+    const {
+      orderId,
+      paymentStatus,
+      paymentType,
+    } = response.locals;
 
     const trx = await db.transaction();
 
     try {
       const itemsBought = await trx('items')
-        .select('*')
-        .where('order_id', orderId)
+          .select('*')
+          .where('order_id', Number(orderId))
 
-      itemsBought.forEach( async(item: Item, index) => {
+      if ( (Number(paymentType) === 1 && Number(paymentStatus) === 3)
+        || (Number(paymentType) === 2 && Number(paymentStatus) === 1) ) {
 
-        const product = await trx('products')
-          .select('stock')
-          .where('code', item.code )
-          .first();
+        itemsBought.forEach( async(item: Item) => {
 
-        await trx('products')
-          .where('code', item.code )
-          .update({
-            stock: product.stock - item.quantity,
-            thisKeyIsSkipped: undefined
-          });
+          const product = await trx('products')
+            .select('stock')
+            .where('code', item.code )
+            .first();
 
-        await trx.commit();
-      })
+          await trx('products')
+            .where('code', item.code )
+            .update({
+              stock: product.stock - item.quantity,
+              thisKeyIsSkipped: undefined
+            });
+
+          await trx.commit();
+        })
+      }
+
+      if ( Number(paymentStatus) === 6 || Number(paymentType) === 7 ) {
+        itemsBought.forEach( async(item: Item) => {
+
+          const product = await trx('products')
+            .select('stock')
+            .where('code', item.code )
+            .first();
+
+          await trx('products')
+            .where('code', item.code )
+            .update({
+              stock: product.stock + item.quantity,
+              thisKeyIsSkipped: undefined
+            });
+
+          await trx.commit();
+        })
+      }
     }
     catch (err) {
       await trx.rollback();
@@ -179,7 +207,7 @@ export default {
       })
     }
 
-    return response.status(200).json({ message: 'successfully updated.'});
+    return response.status(200).json({ message: "product's stock successfully updated."});
   },
 
   async delete (request: Request, response: Response) {
