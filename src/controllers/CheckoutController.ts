@@ -27,8 +27,13 @@ export default {
       fetchStatus = Number(res.status);
       return res.text();
     }).then( (xml: string) => {
-      console.log(xml);
-      return response.status(fetchStatus).json(xmlToJson(xml));
+      if(fetchStatus === 200 ) {
+        return response.status(fetchStatus).json(xmlToJson(xml));
+      }
+      else{
+        console.log(xml);
+        return response.status(fetchStatus).send(new Error("Unexpected error while fetch checkout."))
+      }
     }).catch((error: string) => {
       console.log(error);
       return response.status(400).json({

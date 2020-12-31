@@ -181,7 +181,7 @@ export default {
         })
       }
 
-      if ( Number(paymentStatus) === 6 || Number(paymentType) === 7 ) {
+      if (Number(paymentType) === 2 && Number(paymentStatus) === 7) {
         itemsBought.forEach( async(item: Item) => {
 
           const product = await trx('products')
