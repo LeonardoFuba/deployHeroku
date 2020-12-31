@@ -27,6 +27,7 @@ export default {
       fetchStatus = Number(res.status);
       return res.text();
     }).then( (xml: string) => {
+      console.log(xml);
       return response.status(fetchStatus).json(xmlToJson(xml));
     }).catch((error: string) => {
       console.log(error);

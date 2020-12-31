@@ -151,6 +151,8 @@ export default {
       paymentType,
     } = response.locals;
 
+    console.log(response.locals);
+
     const trx = await db.transaction();
 
     try {
