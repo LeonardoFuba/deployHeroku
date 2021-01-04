@@ -36,9 +36,7 @@ export default {
       }
     }).catch((error: string) => {
       console.log(error);
-      return response.status(400).json({
-        error: 'Unexpected error while request checkout.'
-      })
+      return response.status(400).send(new Error(`${error}`));
     });
   }
 }
