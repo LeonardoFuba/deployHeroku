@@ -12,9 +12,11 @@ import 'dotenv/config';
 const app = express();
 
 var allowedOrigins = [
-  'http://localhost:3000',
-  'https://alira.vercel.app',
-  'https://sandbox.pagseguro.uol.com.br',
+  process.env.CORS_ORIGIN_DEV,
+  process.env.CORS_ORIGIN_TEST,
+  process.env.CORS_ORIGIN_PRODUCTION,
+  process.env.CORS_ORIGIN_SANDBOX,
+  process.env.PAGSEGURO_URL
 ];
 app.use(cors({
   origin: function(origin, callback){

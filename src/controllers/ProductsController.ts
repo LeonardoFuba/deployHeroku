@@ -145,13 +145,14 @@ export default {
 
   async update (request: Request, response: Response) {
 
-    const {
-      orderId,
-      paymentStatus,
-      paymentType,
-    } = response.locals;
+    const { transaction } = response.locals
 
-    console.log(response.locals);
+    const orderId = transaction.items.item.id;
+    const paymentStatus = transaction.status;
+    const paymentType = transaction.paymentMethod.type;
+
+    console.log(transaction);
+
 
     const trx = await db.transaction();
 

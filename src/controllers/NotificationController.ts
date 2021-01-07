@@ -3,8 +3,7 @@ import * as Yup from 'yup';
 import fetch, { Response as Body } from 'node-fetch';
 import querystring from 'querystring';
 
-import xmlToJson from '../utils/xmlToJson';
-import serializeNotificationFetchResponse from '../serializations/serializeNotificationFetchResponse';
+import transactionView from '../views/transaction_view';
 
 
 export default {
@@ -17,8 +16,6 @@ export default {
       notificationType: Yup.string().required(),
     });
 
-    let fetchStatus = 0;
-
     await bodySchema.validate(body, {
       abortEarly: false,
     })
@@ -28,32 +25,27 @@ export default {
       token: process.env.CHECKOUT_TOKEN
     });
 
-    const fetchResponse = await fetch(`https://ws.sandbox.pagseguro.uol.com.br/v3/transactions/notifications/${body.notificationCode}?${params}`, {
+    const config = {
       method: "GET",
-    }).then( (res: Body) => {
-      fetchStatus = Number(res.status);
-      return res.text();
-    }).then( (xml: string) => {
-      return xmlToJson(xml);
-    }).catch((error: string) => {
+    }
+
+
+    try {
+      const xmlResponse = await fetch(`${process.env.PAGSEGURO_URL}/v3/transactions/notifications/${body.notificationCode}?${params}`, config ).then( async(res: Body) => {
+        if (!res.ok) {
+          throw new Error( await res.text() );
+        }
+        return res.text();
+      });
+      response.locals = transactionView.render(xmlResponse);
+    }
+    catch (error) {
       console.log(error);
       return response.status(400).json({
         error: 'Unexpected error while request transaction data.'
-      })
-    });
-
-    if(fetchStatus !== 200){
-      console.log(fetchResponse);
-      return response.status(fetchStatus).send(fetchResponse);
+      });
     }
 
-    const transaction = serializeNotificationFetchResponse(fetchResponse);
-
-    response.locals = {
-      orderId: transaction.items.item.id,
-      paymentStatus: transaction.status,
-      paymentType: transaction.paymentMethod.type,
-    }
     next();
   }
 }
