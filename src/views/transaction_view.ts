@@ -13,7 +13,7 @@ export default {
         // lastEventDate: compactJson.transaction.lastEventDate._text,
         paymentMethod: {
           type: compactJson.transaction.paymentMethod.type._text,
-          // code: compactJson.transaction.paymentMethod.code._text,
+          code: compactJson.transaction.paymentMethod.code._text,
         },
         // paymentLink: compactJson.transaction.paymentLink ? compactJson.transaction.paymentLink : '',
         // grossAmount: compactJson.transaction.grossAmount._text,
